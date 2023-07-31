@@ -7,7 +7,16 @@ const port = 9001;
 // enables all CORS requests
 app.use(cors())
 
-// METARs
+// Airport demographic, ownership, geographic, runways info
+// FAA 28-day NASR subscription by way of api.aeronautical.info
+app.get(`/airport/:airportId`, async (req, res) => {
+    const url = `https://api.aeronautical.info/dev/?airport=${req.params.airportId}&include=demographic&include=ownership&include=geographic&include=runways`
+    const apiResponse = await fetch(url)
+    const data = await apiResponse.json()
+    res.status(200).json(data)
+})
+
+// METARs - aviationweather.gov
 app.get(`/metar/:airportId`, async (req, res) => {
     const url = `https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&stationString=K${req.params.airportId}&hoursBeforeNow=2&mostRecent=true`
 
@@ -23,7 +32,7 @@ app.get(`/metar/:airportId`, async (req, res) => {
     })    
     })
 
-// TAFs
+// TAFs - aviationweather.gov
 app.get(`/taf/:airportId`, async (req, res) => {
     const url = `https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=tafs&requestType=retrieve&format=xml&stationString=K${req.params.airportId}&hoursBeforeNow=2&mostRecent=true`
 
