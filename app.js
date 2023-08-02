@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors')
 const xml2js = require('xml2js');
+const airportDiagrams = require("airport-diagrams")
+const chartSupplements = require("chart-supplements")
 const app = express();
 const port = 9001;
 
@@ -48,6 +50,27 @@ app.get(`/taf/:airportId`, async (req, res) => {
     })    
     })
 
+// Airport Diagrams - NOT WORKING
+
+app.get('/airportDiagram/:airportId', async (req, res) => {
+    try {
+        const diagrams = await airportDiagrams.list(`K${req.params.airportId}`);
+        res.status(200).json(diagrams);
+    } catch (error) {
+        console.error('Error fetching airport diagram:', error);
+        res.status(500).json({ error: 'An error occurred while fetching airport diagram' })
+    }
+})
+
+// Chart Supplements - WORKING
+
+app.get(`/chartSupplement/:airportId`, (req, res) => {
+    chartSupplements.list(`K${req.params.airportId}`)
+        .then(result => {
+        res.status(200).json(result)
+    })
+})
+
 // listen command
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`)
@@ -62,8 +85,4 @@ app.listen(port, () => {
 //     const apiResponse = await fetch(url)
 //     const data = await apiResponse.text()
 //     res.status(200).json(data)
-// })
-
-// app.listen(port, () => {
-//     console.log(`Server is running on port ${port}`)
 // })
